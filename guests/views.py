@@ -3,7 +3,7 @@ from collections import namedtuple
 import random
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
@@ -91,7 +91,7 @@ InviteResponse = namedtuple('InviteResponse', ['guest_pk', 'is_attending', 'meal
 
 def _parse_invite_params(params):
     responses = {}
-    for param, value in params.items():
+    for param, value in list(params.items()):
         if param.startswith('attending'):
             pk = int(param.split('-')[-1])
             response = responses.get(pk, {})
@@ -103,7 +103,7 @@ def _parse_invite_params(params):
             response['meal'] = value
             responses[pk] = response
 
-    for pk, response in responses.items():
+    for pk, response in list(responses.items()):
         yield InviteResponse(pk, response['attending'], response.get('meal', None))
 
 
@@ -129,7 +129,7 @@ def invitation_email_test(request, invite_id):
 
 
 def save_the_date_random(request):
-    template_id = random.choice(SAVE_THE_DATE_CONTEXT_MAP.keys())
+    template_id = random.choice(list(SAVE_THE_DATE_CONTEXT_MAP.keys()))
     return save_the_date_preview(request, template_id)
 
 
